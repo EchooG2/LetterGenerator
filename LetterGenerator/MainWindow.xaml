@@ -1,59 +1,74 @@
 ﻿<Window x:Class="LetterGenerator.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Генератор писем" Height="700" Width="800">
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+        Title="Генератор писем" Height="750" Width="850">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <Label Grid.Row="0" Content="Кому (организация):" Margin="0,5"/>
-        <TextBox x:Name="KomyTextBox" Grid.Row="1" Margin="0,0,0,10"/>
+            <!-- 1. Получатель -->
+            <GroupBox Header="Получатель" Grid.Row="0" Margin="0,0,0,10">
+                <StackPanel Margin="10">
+                    <Label Content="Кому (организация):" Margin="0,5,0,0"/>
+                    <TextBox x:Name="KomyTextBox" Margin="0,0,0,10"/>
 
-        <Label Grid.Row="2" Content="Адресат (должность и ФИО):" Margin="0,5"/>
-        <TextBox x:Name="AddresseeTextBox" Grid.Row="3" Margin="0,0,0,10"/>
+                    <Label Content="Адресат (должность и ФИО):" Margin="0,5,0,0"/>
+                    <TextBox x:Name="AddresseeTextBox" Margin="0,0,0,10"/>
 
-        <Label Grid.Row="4" Content="Имя адресата (в дательном падеже):" Margin="0,5"/>
-        <TextBox x:Name="AddresseeNameTextBox" Grid.Row="5" Margin="0,0,0,10"/>
+                    <Label Content="Имя адресата (в дательном падеже):" Margin="0,5,0,0"/>
+                    <TextBox x:Name="AddresseeNameTextBox" Margin="0,0,0,5"/>
+                </StackPanel>
+            </GroupBox>
 
-        <Label Grid.Row="6" Content="Текст письма:" Margin="0,5"/>
-        <TextBox x:Name="BodyTextBox" Grid.Row="7" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" Height="120" Margin="0,0,0,10"/>
+            <!-- 2. Содержание письма -->
+            <GroupBox Header="Содержание письма" Grid.Row="1" Margin="0,0,0,10">
+                <StackPanel Margin="10">
+                    <Label Content="Тема письма:" Margin="0,5,0,0"/>
+                    <TextBox x:Name="SubjectTextBox" Margin="0,0,0,10"/>
 
-        <Label Grid.Row="8" Content="Подпись (должность и ФИО):" Margin="0,5"/>
-        <TextBox x:Name="ManagerTextBox" Grid.Row="9" Margin="0,0,0,10"/>
+                    <Label Content="Текст письма:" Margin="0,5,0,0"/>
+                    <TextBox x:Name="BodyTextBox" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" 
+                             TextWrapping="Wrap" Height="120" Margin="0,0,0,5"/>
+                </StackPanel>
+            </GroupBox>
 
-        <Label Grid.Row="10" Content="Приложения (вложения):" FontWeight="Bold" Margin="0,10,0,5"/>
-        <DataGrid x:Name="AttachmentsGrid" Grid.Row="11" AutoGenerateColumns="False" Height="150" Margin="0,0,0,5">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Заголовок" Width="*" Binding="{Binding Title}"/>
-                <DataGridTextColumn Header="Содержание" Width="3*" Binding="{Binding Content}"/>
-                <DataGridTemplateColumn Header="Удалить" Width="50">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Content="X" Click="RemoveAttachment_Click" Tag="{Binding}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+            <!-- 3. Отправитель -->
+            <GroupBox Header="Отправитель" Grid.Row="2" Margin="0,0,0,10">
+                <StackPanel Margin="10">
+                    <Label Content="Подпись (должность и ФИО):" Margin="0,5,0,0"/>
+                    <TextBox x:Name="ManagerTextBox" Margin="0,0,0,5"/>
+                </StackPanel>
+            </GroupBox>
 
-        <StackPanel Grid.Row="12" Orientation="Horizontal" Margin="0,10">
-            <Button Content="Добавить приложение" Click="AddAttachment_Click" Width="150" Margin="0,0,10,0"/>
-            <Button Content="Сгенерировать письмо" Click="Generate_Click" Width="180" Background="LightGreen"/>
-        </StackPanel>
-    </Grid>
+            <!-- 4. Приложения -->
+            <GroupBox Header="Приложения (вложения)" Grid.Row="3" Margin="0,0,0,10">
+                <StackPanel Margin="10">
+                    <DataGrid x:Name="AttachmentsGrid" AutoGenerateColumns="False" Height="150" Margin="0,0,0,5">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Заголовок" Width="*" Binding="{Binding Title}"/>
+                            <DataGridTextColumn Header="Содержание" Width="3*" Binding="{Binding Content}"/>
+                            <DataGridTemplateColumn Header="Удалить" Width="50">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="X" Click="RemoveAttachment_Click" Tag="{Binding}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button Content="Добавить приложение" Click="AddAttachment_Click" Width="150" HorizontalAlignment="Left"/>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- 5. Кнопка генерации -->
+            <Button Grid.Row="4" Content="Сгенерировать письмо" Click="Generate_Click" 
+                    Background="LightGreen" Height="40" Margin="0,10,0,0" FontSize="14" FontWeight="Bold"/>
+        </Grid>
+    </ScrollViewer>
 </Window>

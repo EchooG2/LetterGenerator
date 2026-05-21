@@ -35,27 +35,33 @@ namespace LetterGenerator
 
         private void Generate_Click(object sender, RoutedEventArgs e)
         {
-            // 1. 验证输入
-            if (string.IsNullOrWhiteSpace(KomyTextBox.Text) ||
-                string.IsNullOrWhiteSpace(AddresseeTextBox.Text) ||
-                string.IsNullOrWhiteSpace(AddresseeNameTextBox.Text) ||
-                string.IsNullOrWhiteSpace(BodyTextBox.Text) ||
-                string.IsNullOrWhiteSpace(ManagerTextBox.Text))
+            // 收集缺失字段
+            var missingFields = new System.Collections.Generic.List<string>();
+            if (string.IsNullOrWhiteSpace(KomyTextBox.Text)) missingFields.Add("Кому (организация)");
+            if (string.IsNullOrWhiteSpace(AddresseeTextBox.Text)) missingFields.Add("Адресат (должность и ФИО)");
+            if (string.IsNullOrWhiteSpace(AddresseeNameTextBox.Text)) missingFields.Add("Имя адресата (в дательном падеже)");
+            if (string.IsNullOrWhiteSpace(SubjectTextBox.Text)) missingFields.Add("Тема письма");
+            if (string.IsNullOrWhiteSpace(BodyTextBox.Text)) missingFields.Add("Текст письма");
+            if (string.IsNullOrWhiteSpace(ManagerTextBox.Text)) missingFields.Add("Подпись (должность и ФИО)");
+
+            if (missingFields.Count > 0)
             {
-                MessageBox.Show("Пожалуйста, заполните все обязательные поля.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show($"Пожалуйста, заполните следующие поля:\n{string.Join("\n", missingFields)}",
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            // 2. 模板文件路径（需要你事先放在程序目录下）
-            string templatePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Template.docx");
+            // 模板文件路径
+            string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Template.docx");
             if (!File.Exists(templatePath))
             {
                 MessageBox.Show($"Файл шаблона не найден: {templatePath}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
-            // 3. 生成输出文件（放在桌面）
-            string outputPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), $"Letter_{DateTime.Now:yyyyMMdd_HHmmss}.docx");
+            // 输出文件路径（桌面）
+            string outputPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                                $"Letter_{DateTime.Now:yyyyMMdd_HHmmss}.docx");
 
             try
             {
@@ -65,14 +71,15 @@ namespace LetterGenerator
                 {
                     var body = doc.MainDocumentPart.Document.Body;
 
-                    // 替换普通占位符
+                    // 替换占位符
                     ReplacePlaceholder(body, "{KOMY}", KomyTextBox.Text);
                     ReplacePlaceholder(body, "{ADDRESSEE}", AddresseeTextBox.Text);
                     ReplacePlaceholder(body, "{ADDRESSEE_NAME}", AddresseeNameTextBox.Text);
+                    ReplacePlaceholder(body, "{SUBJECT}", SubjectTextBox.Text);
                     ReplacePlaceholder(body, "{TEXT_BODY}", BodyTextBox.Text);
                     ReplacePlaceholder(body, "{MANAGER_NAME}", ManagerTextBox.Text);
 
-                    // 插入附件列表
+                    // 插入附件列表（在签名之前）
                     if (_attachments.Count > 0)
                     {
                         InsertAttachmentList(body, _attachments);
